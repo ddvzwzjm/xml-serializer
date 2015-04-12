@@ -10,5 +10,5 @@ namespace XmlSerializer\Fixtures\Serialize\First;
 
 
 class MessageParameter {
-
+    public $value;
 }

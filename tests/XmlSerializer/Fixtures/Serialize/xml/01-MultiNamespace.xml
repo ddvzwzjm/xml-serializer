@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<Envelope xmlns="com.example.first" xmlns:ns1="com.example.second"><ns1:Message language="en"><Parameter>paramValue</Parameter><ns1:SequenceNumber>1</ns1:SequenceNumber></ns1:Message></Envelope>

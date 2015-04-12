@@ -1,14 +1,26 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: alexerm
- * Date: 4/11/15
- * Time: 15:45
- */
-
 namespace XmlSerializer\Fixtures\Metadata;
 
 
 class PropertyMeta {
+
+    public $basicNode;
+
+    /**
+     * @var \XmlSerializer\Fixtures\Serialize\TextNode
+     */
+    public $typeNode;
+
+    /**
+     * @xmlName NodeHasName
+     */
+    public $namedNode;
+
+    /**
+     * @xmlNamespace com.example.testcase
+     */
+    public $namespaceNode;
+
+    public $UPPERCASE_NODE;
 
 }

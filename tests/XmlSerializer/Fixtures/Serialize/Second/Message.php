@@ -1,14 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: alexerm
- * Date: 4/12/15
- * Time: 21:29
- */
-
 namespace XmlSerializer\Fixtures\Serialize\Second;
 
 
-class SecondMessage {
+class Message {
+    /**
+     * @var \XmlSerializer\Fixtures\Serialize\First\MessageParameter[]
+     */
+    public $Parameter;
 
+    /**
+     * @var \XmlSerializer\Fixtures\Serialize\Second\SequenceNumber
+     */
+    public $SequenceNumber;
+
+    /**
+     * @xmlNamespace com.example.first
+     * @xmlType attribute
+     * @var string
+     */
+    public $language;
 }
