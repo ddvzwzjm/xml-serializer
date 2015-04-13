@@ -134,89 +134,31 @@ class OldSerializer
      *
      * @return \SimpleXMLElement
      */
-    private function xmlHacks(
-        \SimpleXMLElement $xml,
-        \ReflectionProperty $property,
-        \ReflectionClass $propValue
-    ) {
-        if ($property->getName() == 'MandateInfo') {
-            $xml->addAttribute(
-                'xsi:type',
-                $this->mapNs($this->getXmlNs($property)) . ":" . $propValue->getShortName(),
-                "http://www.w3.org/2001/XMLSchema-instance"
-            );
-        }
+//    private function xmlHacks(
+//        \SimpleXMLElement $xml,
+//        \ReflectionProperty $property,
+//        \ReflectionClass $propValue
+//    ) {
+//        if ($property->getName() == 'MandateInfo') {
+//            $xml->addAttribute(
+//                'xsi:type',
+//                $this->mapNs($this->getXmlNs($property)) . ":" . $propValue->getShortName(),
+//                "http://www.w3.org/2001/XMLSchema-instance"
+//            );
+//        }
+//
+//        return $xml;
+//    }
 
-        return $xml;
-    }
-
-    /**
-     * @param \ReflectionProperty $property
-     *
-     * @return string
-     */
-    private function getNodeNameFromProperty(\ReflectionProperty $property)
-    {
-        return "xmlns:"
-               . $this->mapNs($this->getXmlNs($property))
-               . ':'
-               . $property->getName();
-    }
-
-    /**
-     * @param \ReflectionClass $valRefCls
-     * @param \ReflectionProperty $refProp
-     *
-     * @return string
-     * @internal param $refClass
-     *
-     */
-    protected function getNodeName(\ReflectionClass $valRefCls, \ReflectionProperty $refProp = null)
-    {
-        $longNs        = $refProp ? $this->getXmlNs($refProp) : $this->getXmlNs($valRefCls);
-        $nodeShortName = $refProp ? $refProp->getName() : $valRefCls->getShortName();
-        $nodeName      = "xmlns:" . $this->mapNs($longNs) . ":" . $nodeShortName;
-
-        return $nodeName;
-    }
-
-
-    private function _rootNode_INVALID(ClassMetadata $class)
-    {
-        $xml = new \SimpleXMLElement('<' . $class->getXmlNodeName() . '/>');
-
-        $xml->addAttribute('xmlns', $class->getXmlNamespace());
-        $xml->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        // don't want to store additional mapping, @todo avoid it if possible
-//		$xml->addAttribute('xmlns:xsi:schemaLocation', 'urn:iso:std:iso:20022:tech:xsd:pain.001.003.03 pain.001.003.03.xsd');
-
-        return $xml;
-    }
-
-    /**
-     * @param $ns
-     *
-     * @return string
-     */
-    private function mapNs($ns)
-    {
-        return isset( $this->nsMap[ $ns ] ) ? $this->nsMap[ $ns ] : "";
-    }
-
-    /**
-     * @param $refCls
-     *
-     * @return string
-     */
-    private function getXmlNs($refCls)
-    {
-        /** @var \ReflectionClass $annotations */
-        $annotations = $refCls->getDocComment();
-        if (!preg_match('/@xmlNamespace (.*)/', $annotations, $m)) {
-            return ""; // no namespace
-        }
-
-        return $m[1];
-    }
-
+//    private function _rootNode_INVALID(ClassMetadata $class)
+//    {
+//        $xml = new \SimpleXMLElement('<' . $class->getXmlNodeName() . '/>');
+//
+//        $xml->addAttribute('xmlns', $class->getXmlNamespace());
+//        $xml->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+//        // don't want to store additional mapping, @todo avoid it if possible
+////		$xml->addAttribute('xmlns:xsi:schemaLocation', 'urn:iso:std:iso:20022:tech:xsd:pain.001.003.03 pain.001.003.03.xsd');
+//
+//        return $xml;
+//    }
 }
