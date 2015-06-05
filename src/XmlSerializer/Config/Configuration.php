@@ -84,10 +84,12 @@ class Configuration {
 
     /**
      * @param $xmlNamespace
+     *
+     * @return bool
      */
     public function getClassNamespace($xmlNamespace)
     {
-        // TODO: implement this later
+        return isset($this->classNsMap[$xmlNamespace]) ? $this->classNsMap[$xmlNamespace] : false;
     }
 
     /**

@@ -1,86 +1,98 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: alexerm
- * Date: 4/11/15
- * Time: 12:48
- */
-
 namespace XmlSerializer;
 
 
-class OldDeserializer {
+use XmlSerializer\Config\Configuration;
+use XmlSerializer\Deserializer\XmlElement;
+use XmlSerializer\Metadata\ClassMetadata;
+
+class OldDeserializer
+{
+
     /**
-     * @param \SimpleXMLElement $xml
+     * @var Configuration
+     */
+    private $configuration;
+
+    public function __construct(Configuration $configuration = null)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
      *
      * @return mixed
      */
-    public function fromSepaXml(\SimpleXMLElement $xml)
+    public function deserialize($xmlString)
     {
+        /** @var XmlElement $xml */
+        $xml = simplexml_load_string($xmlString, 'XmlSerializer\\Deserializer\\XmlElement'); // todo: move XmlElement class name into configuration
+
         return $this->xmlToObj($xml);
     }
 
     /**
-     * @param \SimpleXMLElement $xml
-     * @param \ReflectionProperty $refProp
+     * @param XmlElement $xml
+     * @param string $rootClassName
      *
      * @return mixed
+     * @throws \Exception
+     *
      */
-    private function xmlToObj(\SimpleXMLElement $xml, \ReflectionProperty $refProp = null)
+    private function xmlToObj(XmlElement $xml, $rootClassName = '')
     {
-        if ($refProp) {
-            $rootClassName = $this->parseVarAnnotation($refProp);
-        } else {
-            $rootClassName = '\\' . $this->classNsMap[ current($xml->getNamespaces()) ] . '\\' . $xml->getName();
+        if (!$rootClassName) {
+            $rootClassName = $xml->getClassName($this->configuration); // todo: use node name index instead
         }
 
         $document = new $rootClassName();
-        $refCls  = new \ReflectionClass($document);
+        $clsMeta  = new ClassMetadata($document);
+        $refCls   = new \ReflectionClass($document);
 
-        foreach ($xml->getDocNamespaces(true, true) as $shortNs => $longNs) {
-            /** @var \SimpleXMLElement $child */
-            foreach ($xml->children($longNs) as $child) {
-                $prop = $child->getName();
-                if ($child->count() > 0) {
-                    $refProp = $refCls->getProperty($child->getName());
-                    if (isset( $document->{$prop} ) && ! is_array($document->{$prop})) {
-                        $document->{$prop} = [$document->{$prop}];
-                    }
-                    if (isset( $document->{$prop} ) && is_array($document->{$prop})) {
-                        $document->{$prop}[] = $this->xmlToObj($child, $refProp);
-                    } else {
-                        $document->{$prop} = $this->xmlToObj($child, $refProp);
-                    }
-                } elseif ($child->attributes($shortNs)->count() > 0) {
-                    $propClassName = $this->parseVarAnnotation($refCls->getProperty($child->getName()));
-                    $document->{$prop} = new $propClassName;
-                    $document->{$prop}->value = $child->__toString();
-                    /** @var \SimpleXMLElement $attr */
-                    foreach ($child->attributes($shortNs) as $attr) {
-                        $attrName = $attr->getName();
-                        $document->{$prop}->{$attrName} = $attr->__toString();
-                    }
-                } else {
-                    $document->{$prop} = $child->__toString();
+        foreach ($xml->getChildrenNodes() as $child) {
+            $prop = $child->getName();
+            if (count($child->getChildrenNodes()) > 0) {
+                if (isset( $document->{$prop} ) && !is_array($document->{$prop})) {
+                    $document->{$prop} = [$document->{$prop}];
                 }
+                else {
+                    if ($clsMeta->hasProperty($child->getName())) {
+                        $propMeta  = $clsMeta->getProperty($child->getName());
+                        $propClass = $propMeta->getClass();
+                    }
+                    else {
+                        $propClass = '\\stdClass';
+                    }
+
+                    if (isset( $document->{$prop} ) && is_array($document->{$prop})) {
+                        $document->{$prop}[] = $this->xmlToObj($child, $propClass);
+                    }
+                    else {
+                        $document->{$prop} = $this->xmlToObj($child, $propClass);
+                    }
+                }
+            }
+            elseif (count($child->getAttributes()) > 0) {
+                if ($clsMeta->hasProperty($child->getName()) && $clsMeta->hasClassProperty($child->getName())) {
+                    $propClassName  = $clsMeta->getProperty($child->getName())->getClass(); // $this->parseVarAnnotation($refCls->getProperty($child->getName()));
+                }
+                else {
+                    $propClassName = '\\stdClass';
+                }
+
+                $document->{$prop}        = new $propClassName;
+                $document->{$prop}->value = $child->__toString();
+                /** @var XMLElement $attr */
+                foreach ($child->getAttributes() as $attr) {
+                    $attrName                       = $attr->getName();
+                    $document->{$prop}->{$attrName} = $attr->__toString();
+                }
+            }
+            else {
+                $document->{$prop} = $child->__toString();
             }
         }
 
         return $document;
-    }
-
-    /**
-     * Shitty implementation for annotation parsing
-     * @return string
-     */
-    private function parseVarAnnotation(\ReflectionProperty $refProp)
-    {
-        /** @var \ReflectionClass $annotations */
-        $annotations = $refProp->getDocComment();
-        if ( ! preg_match('/@var (.*)/', $annotations, $m)) {
-            return false; // no namespace
-        }
-
-        return $m[1];
     }
 }

@@ -129,4 +129,14 @@ class ClassMetadata
     {
         return $this->object;
     }
+
+    public function hasProperty($name)
+    {
+        return isset($this->object->$name);
+    }
+
+    public function hasClassProperty($name)
+    {
+        return $this->reflection->hasProperty($name);
+    }
 }

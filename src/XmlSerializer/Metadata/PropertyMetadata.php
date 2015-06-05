@@ -76,6 +76,16 @@ class PropertyMetadata
         return $xmlName;
     }
 
+    public function getClass()
+    {
+        $className = $this->_parseAnnotation($this->property->getDocComment(), 'var');
+        if (!$className && is_object($this->getValue())) {
+            $className = get_class($this->getValue());
+        }
+
+        return $className;
+    }
+
     /**
      * @param $annotations
      * @param $key

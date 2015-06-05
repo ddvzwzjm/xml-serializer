@@ -6,8 +6,6 @@ use XmlSerializer\Metadata\ClassMetadata;
 
 /**
  * Class Serializer
- *
- * @package Crosslend\ProviderBundle\Services\Sepa
  */
 class OldSerializer
 {

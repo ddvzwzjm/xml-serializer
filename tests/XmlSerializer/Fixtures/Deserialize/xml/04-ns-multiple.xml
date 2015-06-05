@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Root xmlns="urn:com.example.first" xmlns:ns1="urn:com.example.second">
+    <Complex>
+        <ns1:SecondAttribute ns1:attr="secondAttributeValue"/>
+    </Complex>
+    <ns1:SecondComplex>
+        <Attribute attr="firstAttributeValue"/>
+    </ns1:SecondComplex>
+</Root>
